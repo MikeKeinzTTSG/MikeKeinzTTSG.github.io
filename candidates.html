@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Available Candidates | TradeTech Search Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0D1B3E; --navy-mid: #162650; --navy-dark: #0A1428;
+    --blue: #1B4FBF; --blue-bright: #2563EB; --blue-light: #3B82F6;
+    --steel: #6B7FA3; --mist: #C8D4EC; --off-white: #F4F6FB;
+    --white: #ffffff; --border: rgba(255,255,255,0.08); --border-light: rgba(13,27,62,0.1);
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Barlow', sans-serif; background: var(--white); color: var(--navy); overflow-x: hidden; line-height: 1.6; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0 5%; height: 115px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,20,40,0.96); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { display: flex; align-items: center; text-decoration: none; }
+  .nav-logo img { height: 115px; width: auto; display: block; }
+  .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
+  .nav-links a { color: var(--mist); text-decoration: none; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-cta { background: var(--blue-bright) !important; color: var(--white) !important; padding: 10px 22px; border-radius: 4px; }
+
+  .page-hero {
+    min-height: 38vh; background: var(--navy-dark);
+    display: flex; align-items: center;
+    padding: 160px 5% 80px;
+    position: relative; overflow: hidden;
+  }
+  .page-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 60% 50%, rgba(27,79,191,0.15) 0%, transparent 60%); }
+  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; }
+  .page-hero-content { position: relative; z-index: 2; }
+  .page-eyebrow { display: inline-flex; align-items: center; gap: 10px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); color: var(--blue-light); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 8px 16px; border-radius: 2px; margin-bottom: 24px; }
+  .page-eyebrow::before { content: ''; width: 6px; height: 6px; background: var(--blue-light); border-radius: 50%; }
+  h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(44px, 6vw, 72px); font-weight: 800; line-height: 0.95; color: var(--white); text-transform: uppercase; margin-bottom: 20px; }
+  h1 span { color: var(--blue-light); }
+  .hero-sub { font-size: 17px; font-weight: 300; color: var(--mist); max-width: 560px; line-height: 1.7; font-style: italic; }
+  .hero-divider { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: var(--off-white); clip-path: polygon(0 80%, 100% 0%, 100% 100%, 0% 100%); }
+
+  /* FILTERS */
+  .filters-bar { background: var(--off-white); padding: 28px 5%; border-bottom: 1px solid var(--border-light); }
+  .filters-inner { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .filter-label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--steel); margin-right: 4px; }
+  .filter-btn { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 16px; border-radius: 2px; border: 1px solid var(--border-light); background: var(--white); color: var(--steel); cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+  /* CANDIDATES GRID */
+  .candidates-section { background: var(--off-white); padding: 60px 5% 100px; }
+  .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+  .section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-bright); margin-bottom: 8px; }
+  h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px, 3vw, 44px); font-weight: 800; text-transform: uppercase; color: var(--navy); }
+  h2 em { font-style: normal; color: var(--blue-bright); }
+  .candidate-count { font-size: 13px; color: var(--steel); font-weight: 600; }
+
+  .candidates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+
+  .candidate-card {
+    background: var(--white); border: 1px solid var(--border-light);
+    border-radius: 6px; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+  }
+  .candidate-card:hover { transform: translateY(-4px); border-color: var(--blue-bright); }
+
+  .card-header { background: var(--navy); padding: 28px 28px 24px; }
+  .card-tag-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .card-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 2px; }
+  .tag-available { background: rgba(37,99,235,0.2); color: var(--blue-light); }
+  .tag-passive { background: rgba(255,193,7,0.15); color: #FFC107; }
+  .tag-confidential { background: rgba(255,255,255,0.08); color: var(--mist); }
+
+  .card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; text-transform: uppercase; color: var(--white); margin-bottom: 6px; line-height: 1.2; }
+  .card-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .card-meta-item { font-size: 12px; color: var(--mist); display: flex; align-items: center; gap: 5px; }
+  .card-meta-item::before { content: ''; width: 4px; height: 4px; background: var(--blue-light); border-radius: 50%; flex-shrink: 0; }
+
+  .card-body { padding: 24px 28px; }
+  .card-summary { font-size: 14px; line-height: 1.7; color: var(--steel); margin-bottom: 20px; }
+  .card-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .skill-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--navy); background: var(--off-white); border: 1px solid var(--border-light); padding: 4px 10px; border-radius: 2px; }
+
+  .card-actions { display: flex; gap: 10px; }
+  .btn-view-resume { background: var(--blue-bright); color: var(--white); padding: 10px 20px; font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; transition: background 0.2s; display: inline-block; }
+  .btn-view-resume:hover { background: var(--blue-light); }
+  .btn-contact { background: transparent; color: var(--navy); padding: 10px 20px; font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border-radius: 4px; border: 1px solid var(--border-light); transition: all 0.2s; display: inline-block; }
+  .btn-contact:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 80px 40px; color: var(--steel); }
+  .empty-state h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; text-transform: uppercase; color: var(--navy); margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; line-height: 1.7; max-width: 400px; margin: 0 auto; }
+
+  /* ADMIN PANEL */
+  .admin-toggle { position: fixed; bottom: 32px; right: 32px; z-index: 200; }
+  .admin-btn { background: var(--navy); color: var(--white); border: 1px solid rgba(37,99,235,0.4); padding: 12px 20px; font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+  .admin-btn:hover { background: var(--blue-bright); }
+
+  .admin-modal { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
+  .admin-modal.open { display: flex; }
+  .admin-panel { background: var(--white); border-radius: 8px; padding: 40px; width: 90%; max-width: 580px; max-height: 90vh; overflow-y: auto; position: relative; }
+  .admin-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--steel); }
+  .admin-title { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; text-transform: uppercase; color: var(--navy); margin-bottom: 6px; }
+  .admin-sub { font-size: 13px; color: var(--steel); margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid rgba(13,27,62,0.15); border-radius: 4px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--navy); outline: none; transition: border-color 0.2s; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--blue-bright); }
+  .form-group textarea { height: 80px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .skills-input-note { font-size: 11px; color: var(--steel); margin-top: 4px; }
+  .admin-submit { width: 100%; background: var(--blue-bright); color: var(--white); padding: 12px; font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: 4px; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+  .admin-submit:hover { background: var(--blue-light); }
+  .admin-password { margin-bottom: 24px; padding: 16px; background: var(--off-white); border-radius: 4px; border: 1px solid var(--border-light); }
+  .admin-password label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); margin-bottom: 6px; }
+  .admin-password input { width: 100%; padding: 10px 14px; border: 1px solid rgba(13,27,62,0.15); border-radius: 4px; font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--navy); outline: none; }
+
+  /* CTA */
+  .cta-section { background: var(--navy-dark); text-align: center; padding: 80px 5%; position: relative; overflow: hidden; }
+  .cta-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(37,99,235,0.1) 0%, transparent 60%); }
+  .cta-section h2 { color: var(--white); font-size: clamp(32px,4vw,52px); margin-bottom: 14px; position: relative; z-index: 1; }
+  .cta-sub { font-size: 16px; color: var(--mist); font-style: italic; margin-bottom: 36px; position: relative; z-index: 1; }
+  .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+  .btn-primary { background: var(--blue-bright); color: var(--white); padding: 14px 32px; font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border-radius: 4px; display: inline-block; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--blue-light); }
+  .btn-outline { background: transparent; color: var(--mist); padding: 14px 32px; font-family: 'Barlow', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; border-radius: 4px; border: 1px solid rgba(200,212,236,0.3); display: inline-block; transition: all 0.2s; }
+  .btn-outline:hover { border-color: var(--mist); color: var(--white); }
+
+  footer { background: #060D1E; padding: 48px 5% 28px; border-top: 1px solid var(--border); }
+  .footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 40px; }
+  .footer-brand img { height: 70px; width: auto; display: block; margin-bottom: 14px; }
+  .footer-tagline { font-size: 13px; color: var(--steel); line-height: 1.7; font-style: italic; max-width: 280px; }
+  .footer-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--steel); margin-bottom: 16px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul li a { color: var(--mist); text-decoration: none; font-size: 14px; opacity: 0.7; transition: opacity 0.2s; }
+  .footer-col ul li a:hover { opacity: 1; }
+  .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; }
+  .footer-copy { font-size: 12px; color: var(--steel); opacity: 0.6; }
+
+  @media (max-width: 900px) {
+    .candidates-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="https://raw.githubusercontent.com/MikeKeinzTTSG/MikeKeinzTTSG.github.io/main/TradeTech_Primary_Logo.png" alt="TradeTech Search Group" style="height:115px;width:auto;display:block;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#expertise">Expertise</a></li>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#industries">Industries</a></li>
+    <li><a href="candidates.html" class="active">Candidates</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Work With Us</a></li>
+  </ul>
+</nav>
+
+<section class="page-hero">
+  <div class="hero-grid"></div>
+  <div class="page-hero-content">
+    <div class="page-eyebrow">Available Talent</div>
+    <h1>Candidates Ready<br><span>to Make an Impact</span></h1>
+    <p class="hero-sub">A curated selection of vetted Automation, AI, Robotics, and Engineering professionals actively represented by TradeTech Search Group.</p>
+  </div>
+  <div class="hero-divider"></div>
+</section>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <div class="filters-inner">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+    <button class="filter-btn" onclick="filterCards('ai', this)">AI / ML</button>
+    <button class="filter-btn" onclick="filterCards('robotics', this)">Robotics</button>
+    <button class="filter-btn" onclick="filterCards('controls', this)">Controls / PLC</button>
+    <button class="filter-btn" onclick="filterCards('automation', this)">Automation</button>
+    <button class="filter-btn" onclick="filterCards('executive', this)">Executive</button>
+    <button class="filter-btn" onclick="filterCards('operations', this)">Strategic Operations</button>
+  </div>
+</div>
+
+<!-- CANDIDATES -->
+<section class="candidates-section" id="candidates">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Currently Represented</div>
+      <h2>Available <em>Candidates</em></h2>
+    </div>
+    <span class="candidate-count" id="count-display"></span>
+  </div>
+  <div class="candidates-grid" id="candidates-grid">
+    <!-- Cards injected by JS -->
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Interested in a <em>Candidate?</em></h2>
+  <p class="cta-sub">Reach out and we'll arrange an introduction within 24 hours.</p>
+  <div class="cta-buttons">
+    <a href="index.html#contact" class="btn-primary">Contact Us</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="https://raw.githubusercontent.com/MikeKeinzTTSG/MikeKeinzTTSG.github.io/main/TradeTech_Primary_Logo.png" alt="TradeTech Search Group">
+      <p class="footer-tagline">Boutique executive search firm specializing in automation, AI, and engineering talent across the Northeast.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="candidates.html">Candidates</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="index.html#services">Contingency Search</a></li>
+        <li><a href="index.html#services">Retained Search</a></li>
+        <li><a href="index.html#expertise">Expertise Areas</a></li>
+        <li><a href="index.html#industries">Industries</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 TradeTech Search Group. All rights reserved.</span>
+    <span class="footer-copy">Connecticut & Greater Northeast</span>
+  </div>
+</footer>
+
+<!-- ADMIN TOGGLE -->
+<div class="admin-toggle">
+  <button class="admin-btn" onclick="openAdmin()">+ Add Candidate</button>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="admin-modal" id="admin-modal">
+  <div class="admin-panel">
+    <button class="admin-close" onclick="closeAdmin()">✕</button>
+    <div class="admin-title">Add MPC Profile</div>
+    <p class="admin-sub">Fill in the candidate details. The resume link should be a Google Drive shareable link or direct PDF URL.</p>
+
+    <div class="admin-password">
+      <label>Admin Password</label>
+      <input type="password" id="admin-pass" placeholder="Enter password to add candidates">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Candidate Title *</label>
+        <input type="text" id="f-title" placeholder="e.g. Senior Controls Engineer">
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="f-category">
+          <option value="robotics">Robotics</option>
+          <option value="ai">AI / ML</option>
+          <option value="controls">Controls / PLC</option>
+          <option value="automation">Automation</option>
+          <option value="executive">Executive</option>
+          <option value="operations">Strategic Operations</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Years of Experience *</label>
+        <input type="text" id="f-exp" placeholder="e.g. 8 years">
+      </div>
+      <div class="form-group">
+        <label>Location *</label>
+        <input type="text" id="f-location" placeholder="e.g. Boston, MA">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="f-status">
+        <option value="available">Active — Available Now</option>
+        <option value="passive">Passive — Open to Right Opportunity</option>
+        <option value="confidential">Confidential</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Brief Summary (2-3 sentences) *</label>
+      <textarea id="f-summary" placeholder="Describe the candidate's background and value proposition..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Key Skills (comma separated) *</label>
+      <input type="text" id="f-skills" placeholder="e.g. Studio 5000, EtherNet/IP, HMI, Robotics, Python">
+      <p class="skills-input-note">Separate each skill with a comma</p>
+    </div>
+    <div class="form-group">
+      <label>Resume Link (Google Drive or PDF URL) *</label>
+      <input type="text" id="f-resume" placeholder="https://drive.google.com/file/d/...">
+    </div>
+    <button class="admin-submit" onclick="addCandidate()">Add to Candidate Page</button>
+    <p id="admin-msg" style="font-size:13px; margin-top:12px; color: var(--blue-bright); text-align:center;"></p>
+  </div>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = "Christianjoel2026";
+  const STORAGE_KEY = "tt_candidates_v1";
+
+  const statusMap = {
+    available: { label: "Active — Available Now", cls: "tag-available" },
+    passive: { label: "Passive — Open to Right Opportunity", cls: "tag-passive" },
+    confidential: { label: "Confidential", cls: "tag-confidential" }
+  };
+
+  function loadCandidates() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  function saveCandidates(candidates) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(candidates)); } catch(e) { console.error(e); }
+  }
+
+  function renderCards(filter = 'all') {
+    const candidates = loadCandidates();
+    const grid = document.getElementById('candidates-grid');
+    const filtered = filter === 'all' ? candidates : candidates.filter(c => c.category === filter);
+
+    document.getElementById('count-display').textContent = filtered.length + ' candidate' + (filtered.length !== 1 ? 's' : '') + ' available';
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+        <h3>No Candidates Yet</h3>
+        <p>Check back soon — we represent new candidates weekly. Contact us directly for immediate needs.</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map((c, i) => {
+      const skills = c.skills.split(',').map(s => `<span class="skill-tag">${s.trim()}</span>`).join('');
+      const status = statusMap[c.status] || statusMap.available;
+      return `
+        <div class="candidate-card" data-category="${c.category}">
+          <div class="card-header">
+            <div class="card-tag-row">
+              <span class="card-tag ${status.cls}">${status.label}</span>
+              <span class="card-tag tag-confidential">${c.category.toUpperCase()}</span>
+            </div>
+            <div class="card-title">${c.title}</div>
+            <div class="card-meta">
+              <span class="card-meta-item">${c.exp}</span>
+              <span class="card-meta-item">${c.location}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-summary">${c.summary}</p>
+            <div class="card-skills">${skills}</div>
+            <div class="card-actions">
+              <a href="${c.resume}" target="_blank" class="btn-view-resume">View Resume ↗</a>
+              <a href="index.html#contact" class="btn-contact">Inquire</a>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterCards(filter, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCards(filter);
+  }
+
+  function openAdmin() { document.getElementById('admin-modal').classList.add('open'); }
+  function closeAdmin() {
+    document.getElementById('admin-modal').classList.remove('open');
+    document.getElementById('admin-msg').textContent = '';
+    document.getElementById('admin-pass').value = '';
+  }
+
+  function addCandidate() {
+    const pass = document.getElementById('admin-pass').value;
+    if (pass !== ADMIN_PASSWORD) {
+      document.getElementById('admin-msg').textContent = 'Incorrect password.';
+      document.getElementById('admin-msg').style.color = '#ef4444';
+      return;
+    }
+
+    const title = document.getElementById('f-title').value.trim();
+    const category = document.getElementById('f-category').value;
+    const exp = document.getElementById('f-exp').value.trim();
+    const location = document.getElementById('f-location').value.trim();
+    const status = document.getElementById('f-status').value;
+    const summary = document.getElementById('f-summary').value.trim();
+    const skills = document.getElementById('f-skills').value.trim();
+    const resume = document.getElementById('f-resume').value.trim();
+
+    if (!title || !exp || !location || !summary || !skills || !resume) {
+      document.getElementById('admin-msg').textContent = 'Please fill in all required fields.';
+      document.getElementById('admin-msg').style.color = '#ef4444';
+      return;
+    }
+
+    const candidates = loadCandidates();
+    candidates.unshift({ title, category, exp, location, status, summary, skills, resume, added: new Date().toISOString() });
+    saveCandidates(candidates);
+
+    // Clear form
+    ['f-title','f-exp','f-location','f-summary','f-skills','f-resume','admin-pass'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('admin-msg').textContent = 'Candidate added successfully!';
+    document.getElementById('admin-msg').style.color = 'var(--blue-bright)';
+
+    renderCards('all');
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filter-btn')[0].classList.add('active');
+
+    setTimeout(closeAdmin, 1500);
+  }
+
+  // Init
+  renderCards();
+</script>
+
+</body>
+</html>
